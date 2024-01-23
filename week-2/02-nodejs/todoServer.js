@@ -43,7 +43,27 @@
   const bodyParser = require('body-parser');
   
   const app = express();
+  const taskMap = new Map()
+  var id =0
   
   app.use(bodyParser.json());
+
+  app.post('/todos', (req, res)=>{
+    const reqBody = req.body
+    if(taskMap.size !=0){
+      for (let value of taskMap.values()) {
+        // Using JSON.stringify to compare the JSON objects
+        if (JSON.stringify(value) === JSON.stringify(reqBody)) {
+res.status(404).json({'error_msg':'Task already exists'}) 
+return;
+     }
+      }
+    }
+    id += 1
+    taskMap.set(id, reqBody)
+    res.status(201).json({'id':id})
+  })
+
+  app.listen(3000)
   
   module.exports = app;
