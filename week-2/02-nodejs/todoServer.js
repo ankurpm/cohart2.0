@@ -39,31 +39,69 @@
 
   Testing the server - run `npm run test-todoServer` command in terminal
  */
-  const express = require('express');
-  const bodyParser = require('body-parser');
-  
-  const app = express();
-  const taskMap = new Map()
-  var id =0
-  
-  app.use(bodyParser.json());
+const express = require('express');
+const bodyParser = require('body-parser');
 
-  app.post('/todos', (req, res)=>{
-    const reqBody = req.body
-    if(taskMap.size !=0){
-      for (let value of taskMap.values()) {
-        // Using JSON.stringify to compare the JSON objects
-        if (JSON.stringify(value) === JSON.stringify(reqBody)) {
-res.status(404).json({'error_msg':'Task already exists'}) 
-return;
-     }
+const app = express();
+const taskMap = new Map()
+var id = 0
+
+app.use(bodyParser.json());
+
+app.post('/todos', (req, res) => {
+  const reqBody = req.body
+  if (taskMap.size != 0) {
+    for (let value of taskMap.values()) {
+      if (JSON.stringify(value) === JSON.stringify(reqBody)) {
+        res.status(404).json({ 'error_msg': 'Task already exists' })
+        return;
       }
     }
-    id += 1
-    taskMap.set(id, reqBody)
-    res.status(201).json({'id':id})
-  })
+  }
+  id += 1
+  taskMap.set(id, reqBody)
+  res.status(201).json({ 'id': id })
+})
 
-  app.listen(3000)
-  
-  module.exports = app;
+app.get('/todos', (req, res) => {
+  var taskArr = []
+  for (let value of taskMap.values()) {
+    console.log('inside taskArr')
+    console.log(value)
+    taskArr.push((value))
+
+  }
+  res.send(taskArr)
+})
+
+app.get('/todos/:taskId', (req, res) => {
+  const taskId = parseInt(req.params.taskId)
+  if (!taskMap.has(taskId)) {
+    res.status(404).json({ "error": "task doesn't exist" })
+  }
+  var result = taskMap.get(parseInt(taskId))
+  res.send(result)
+})
+
+app.put('/todos/:taskId', (req, res) => {
+  const taskId = parseInt(req.params.taskId)
+  if (!taskMap.has(taskId)) {
+    res.status(404).json({ "error": "task doesn't exist" })
+  }
+  taskMap.set(taskId, req.body)
+  res.send("Updated")
+})
+
+app.delete('/todos/:taskId', (req, res) => {
+  const taskId = parseInt(req.params.taskId)
+  if (!taskMap.has(taskId)) {
+    res.status(404).json({ "error": "task doesn't exist" })
+  }
+  taskMap.delete(taskId)
+  id = 0
+  res.send("Deleted")
+})
+
+app.listen(3000)
+
+module.exports = app;
