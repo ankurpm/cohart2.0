@@ -59,6 +59,7 @@ app.post('/todos', (req, res) => {
     }
   }
   id += 1
+  reqBody.id=id
   taskMap.set(id, reqBody)
   res.status(201).json({ 'id': id })
 })
@@ -101,7 +102,5 @@ app.delete('/todos/:taskId', (req, res) => {
   id = 0
   res.send("Deleted")
 })
-
-app.listen(3000)
 
 module.exports = app;
