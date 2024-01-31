@@ -23,12 +23,16 @@ app.get('/files', (req, res) => {
   })
 })
 
-app.get('/files/:fileName', (req, res) => {
-  fs.readFile('./files/'+req.params.fileName, (err, data) =>{
+app.get('/file/:filename', (req, res) => {
+  fs.readFile('./files/'+req.params.filename,'utf8', (err, data) =>{
+    if(err){
+      res.status(404).send('File not found')
+    }
     res.send(data)
   })
 })
 
-app.listen(3000)
-
+app.all('*',(req, res) =>{
+  res.status(404).send('Route not found')
+})
 module.exports = app;
