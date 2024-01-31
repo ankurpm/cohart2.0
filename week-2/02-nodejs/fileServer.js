@@ -23,6 +23,12 @@ app.get('/files', (req, res) => {
   })
 })
 
+app.get('/files/:fileName', (req, res) => {
+  fs.readFile('./files/'+req.params.fileName, (err, data) =>{
+    res.send(data)
+  })
+})
+
 app.listen(3000)
 
 module.exports = app;
