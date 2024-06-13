@@ -13,15 +13,29 @@ const app = express();
 
 let numberOfRequestsForUser = {};
 setInterval(() => {
-    numberOfRequestsForUser = {};
+  numberOfRequestsForUser = {};
 }, 1000)
 
-app.get('/user', function(req, res) {
+app.use(rateCalculator)
+app.get('/user', function (req, res) {
   res.status(200).json({ name: 'john' });
 });
 
-app.post('/user', function(req, res) {
+app.post('/user', function (req, res) {
   res.status(200).json({ msg: 'created dummy user' });
 });
+
+function rateCalculator(req, res, next) {
+  const userId = req.header("user-id")
+  if (numberOfRequestsForUser.user == userId && numberOfRequestsForUser.requests > 5) {
+    res.status(404).send("blocked")
+  } else if (numberOfRequestsForUser.user == userId) {
+    numberOfRequestsForUser.requests = numberOfRequestsForUser.requests + 1
+  } else {
+    numberOfRequestsForUser.user = userId
+    numberOfRequestsForUser.requests = 1
+  }
+  next()
+}
 
 module.exports = app;
